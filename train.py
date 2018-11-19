@@ -18,8 +18,8 @@ argparser.add_argument(
     '--conf',
     help='path to configuration file')
 
-def _main_(args):
-    config_path = args.conf
+def _main_(individual):
+    config_path = 'config.json'
 
     with open(config_path) as config_buffer:    
         config = json.loads(config_buffer.read())
@@ -67,7 +67,8 @@ def _main_(args):
                 input_size          = config['model']['input_size'], 
                 labels              = config['model']['labels'], 
                 max_box_per_image   = config['model']['max_box_per_image'],
-                anchors             = config['model']['anchors'])
+                anchors             = config['model']['anchors'],
+                ind = individual)
 
     ###############################
     #   Load the pretrained weights (if any) 
@@ -81,21 +82,18 @@ def _main_(args):
     #   Start the training process 
     ###############################
 
-    yolo.train(train_imgs         = train_imgs,
-               valid_imgs         = valid_imgs,
-               train_times        = config['train']['train_times'],
-               valid_times        = config['valid']['valid_times'],
-               nb_epochs          = config['train']['nb_epochs'], 
-               learning_rate      = config['train']['learning_rate'], 
-               batch_size         = config['train']['batch_size'],
-               warmup_epochs      = config['train']['warmup_epochs'],
-               object_scale       = config['train']['object_scale'],
-               no_object_scale    = config['train']['no_object_scale'],
-               coord_scale        = config['train']['coord_scale'],
-               class_scale        = config['train']['class_scale'],
-               saved_weights_name = config['train']['saved_weights_name'],
-               debug              = config['train']['debug'])
-
-if __name__ == '__main__':
-    args = argparser.parse_args()
-    _main_(args)
+    score = yolo.train(train_imgs         = train_imgs,
+                       valid_imgs         = valid_imgs,
+                       train_times        = config['train']['train_times'],
+                       valid_times        = config['valid']['valid_times'],
+                       nb_epochs          = config['train']['nb_epochs'],
+                       learning_rate      = config['train']['learning_rate'],
+                       batch_size         = config['train']['batch_size'],
+                       warmup_epochs      = config['train']['warmup_epochs'],
+                       object_scale       = config['train']['object_scale'],
+                       no_object_scale    = config['train']['no_object_scale'],
+                       coord_scale        = config['train']['coord_scale'],
+                       class_scale        = config['train']['class_scale'],
+                       saved_weights_name = config['train']['saved_weights_name'],
+                       debug              = config['train']['debug'])
+    return score

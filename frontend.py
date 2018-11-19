@@ -18,7 +18,8 @@ class YOLO(object):
                        input_size, 
                        labels, 
                        max_box_per_image,
-                       anchors):
+                       anchors,
+                       ind):
 
         self.input_size = input_size
         
@@ -59,12 +60,23 @@ class YOLO(object):
         self.grid_h, self.grid_w = self.feature_extractor.get_output_shape()        
         features = self.feature_extractor.extract(input_image)            
 
+        outputs = []
+        outputs.append(features)
+        for i, l in enumerate(ind):
+            print(i, l.bypass_index)
+            i += 1
+            if l.bypass_index == None:
+               outputs.append(l.evaluate(outputs[i - 1]))
+            else:
+                outputs.append(l.evaluate([outputs[i - 1], outputs[l.bypass_index]]))
+            l.output_shape = outputs[i].shape
+
         # make the object detection layer
         output = Conv2D(self.nb_box * (4 + 1 + self.nb_class), 
                         (1,1), strides=(1,1), 
                         padding='same', 
                         name='DetectionLayer', 
-                        kernel_initializer='lecun_normal')(features)
+                        kernel_initializer='lecun_normal')(outputs[-1])
         output = Reshape((self.grid_h, self.grid_w, self.nb_box, 4 + 1 + self.nb_class))(output)
         output = Lambda(lambda args: args[0])([output, self.true_boxes])
 
@@ -328,7 +340,7 @@ class YOLO(object):
         self.model.fit_generator(generator        = train_generator, 
                                  steps_per_epoch  = len(train_generator) * train_times, 
                                  epochs           = warmup_epochs + nb_epochs, 
-                                 verbose          = 2 if debug else 1,
+                                 verbose          = 1,
                                  validation_data  = valid_generator,
                                  validation_steps = len(valid_generator) * valid_times,
                                  callbacks        = [early_stop, checkpoint, tensorboard], 
@@ -343,7 +355,9 @@ class YOLO(object):
         # print evaluation
         for label, average_precision in average_precisions.items():
             print(self.labels[label], '{:.4f}'.format(average_precision))
-        print('mAP: {:.4f}'.format(sum(average_precisions.values()) / len(average_precisions)))         
+        print('mAP: {:.4f}'.format(sum(average_precisions.values()) / len(average_precisions)))
+
+        return sum(average_precisions.values()) / len(average_precisions)
 
     def evaluate(self, 
                  generator, 
