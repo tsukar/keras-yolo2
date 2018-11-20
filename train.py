@@ -18,7 +18,7 @@ argparser.add_argument(
     '--conf',
     help='path to configuration file')
 
-def _main_(individual):
+def _main_(individual, is_final):
     config_path = 'config.json'
 
     with open(config_path) as config_buffer:    
@@ -86,7 +86,7 @@ def _main_(individual):
                        valid_imgs         = valid_imgs,
                        train_times        = config['train']['train_times'],
                        valid_times        = config['valid']['valid_times'],
-                       nb_epochs          = config['train']['nb_epochs'],
+                       nb_epochs          = 10 if is_final else config['train']['nb_epochs'],
                        learning_rate      = config['train']['learning_rate'],
                        batch_size         = config['train']['batch_size'],
                        warmup_epochs      = config['train']['warmup_epochs'],
@@ -96,4 +96,4 @@ def _main_(individual):
                        class_scale        = config['train']['class_scale'],
                        saved_weights_name = config['train']['saved_weights_name'],
                        debug              = config['train']['debug'])
-    return score
+    return yolo.model, score
