@@ -18,7 +18,7 @@ argparser.add_argument(
     '--conf',
     help='path to configuration file')
 
-def _main_(individual, is_final):
+def _main_(individual, g, ngen):
     config_path = 'config.json'
 
     with open(config_path) as config_buffer:    
@@ -82,11 +82,16 @@ def _main_(individual, is_final):
     #   Start the training process 
     ###############################
 
+    def adaptiveNumEpochs(g, ngen):
+        min_epochs = 2
+        max_epochs = config['train']['nb_epochs']
+        return ((ngen - g) * min_epochs + g * max_epochs) // ngen
+
     score = yolo.train(train_imgs         = train_imgs,
                        valid_imgs         = valid_imgs,
                        train_times        = config['train']['train_times'],
                        valid_times        = config['valid']['valid_times'],
-                       nb_epochs          = 10 if is_final else config['train']['nb_epochs'],
+                       nb_epochs          = adaptiveNumEpochs(g, ngen),
                        learning_rate      = config['train']['learning_rate'],
                        batch_size         = config['train']['batch_size'],
                        warmup_epochs      = config['train']['warmup_epochs'],
