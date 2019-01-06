@@ -11,11 +11,11 @@
         "train_image_folder":   "/home/rtsukada/keras-yolo2/data/x-ray/train/",
         "train_annot_folder":   "/home/rtsukada/keras-yolo2/data/x-ray/train_ann/",
 
-        "train_times":          8,
+        "train_times":          1,
         "pretrained_weights":   "",
-        "batch_size":           16,
+        "batch_size":           64,
         "learning_rate":        1e-4,
-        "nb_epochs":            1,
+        "nb_epochs":            400,
         "warmup_epochs":        0,
 
         "object_scale":         5.0 ,
