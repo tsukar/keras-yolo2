@@ -1,0 +1,7 @@
+# Jupyter Notebook files
+/__pycache__/
+/.ipynb_checkpoints/
+
+# Graphviz output files
+/models/*
+!/models/.keep
