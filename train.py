@@ -83,7 +83,7 @@ def _main_(individual, g, ngen):
     ###############################
 
     def adaptiveNumEpochs(g, ngen):
-        min_epochs = 2
+        min_epochs = 100
         max_epochs = config['train']['nb_epochs']
         return ((ngen - g) * min_epochs + g * max_epochs) // ngen
 
